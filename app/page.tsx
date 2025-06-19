@@ -2,6 +2,7 @@ import { Navbar } from "@/components/navbar"
 import { StatsSection } from "@/components/stats-section"
 import { BrandKitsSection } from "@/components/brand-kits-section"
 import { CarbonEmissionsSection } from "@/components/carbon-emissions-section"
+import CustomerSay from "@/components/CustomerSay"
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
         <StatsSection />
         <BrandKitsSection />
         <CarbonEmissionsSection />
+        <CustomerSay/>
       </main>
     </div>
   )
