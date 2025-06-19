@@ -45,23 +45,17 @@ export function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             <nav className="flex items-center space-x-6">
+           
               <a
-                href="#stats"
+                href="/Parallelx"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                Analytics
-              </a>
+Parallelx              </a>
               <a
-                href="#brands"
+                href="/features"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                Brand Kits
-              </a>
-              <a
-                href="#emissions"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Emissions
+                Features
               </a>
               <a
                 href="/index.html"
@@ -115,8 +109,7 @@ export function Navbar() {
                 className="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-all duration-200"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Analytics
-              </a>
+Parallelx              </a>
               <a
                 href="/features"
                 className="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-all duration-200"
