@@ -3,7 +3,7 @@
 
 This project is a submission for **Front-End Battle Round 1**, built with **Next.js** and **Tailwind CSS**. It features dynamic, responsive UI components and animations using modern frontend libraries.
 
-🔗 [Live Demo](https://front-end-battle-round1.vercel.app)
+🔗 [Live Demo](https://front-end-batttle-round1.vercel.app/)
 
 ---
 
@@ -70,7 +70,7 @@ Now open [http://localhost:3000](http://localhost:3000) in your browser.
 ## 📤 Deployment
 
 This project is auto-deployed on **Vercel**
-➡️ [front-end-battle-round1.vercel.app](https://front-end-battle-round1.vercel.app)
+➡️ [front-end-battle-round1.vercel.app](https://front-end-batttle-round1.vercel.app/)
 
 ---
 
