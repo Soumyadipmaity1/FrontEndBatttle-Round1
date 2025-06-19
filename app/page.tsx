@@ -8,7 +8,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
       <Navbar />
-      <main className="container mx-auto px-4 py-8 space-y-12">
+      <main className="container mx-auto px-3 py-8 space-y-12">
         <StatsSection />
         <BrandKitsSection />
         <CarbonEmissionsSection />
