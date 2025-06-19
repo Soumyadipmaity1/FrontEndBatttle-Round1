@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, useRef } from 'react';
 import { FaCreditCard, FaBolt, FaLayerGroup, FaBell } from 'react-icons/fa';
 
 // Define types for our feature structure
@@ -132,25 +132,47 @@ export default function FeaturesPage() {
   const [progress, setProgress] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [animationComplete, setAnimationComplete] = useState<boolean[]>([false, false, false, false]);
-  const autoRotateDuration = 5000; // 5 seconds per feature
-  const animationDuration = 2000; // 2 seconds for border filling
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const rotateTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Animation timing constants - FASTER TRANSITIONS
+  const fillDuration = 1200; // 1.2 seconds for border filling (reduced from 2.5s)
+  const contentShowDelay = 50; // 50ms delay before showing content (reduced from 100ms)
+  const displayDuration = 1800; // 1.8 seconds to display content after filling (reduced from 3.5s)
+  const transitionDuration = 400; // 400ms for fade transition (reduced from 700ms)
   
   // Reset all animations when changing features
   const resetAnimations = () => {
     setAnimationComplete([false, false, false, false]);
+    setProgress(0);
+  };
+  
+  // Clean up all timers
+  const clearAllTimers = () => {
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
+    if (rotateTimerRef.current) clearTimeout(rotateTimerRef.current);
   };
   
   // Handle feature change with proper animation states
   const changeFeature = (index: number) => {
+    if (isTransitioning) return;
+    
+    clearAllTimers();
     resetAnimations();
     setIsTransitioning(true);
-    setProgress(0);
-    setActiveFeature(index);
     
-    // Reset transition state after animation completes
+    // Brief delay before actually changing the feature for smoother transitions
     setTimeout(() => {
-      setIsTransitioning(false);
-    }, 500);
+      setActiveFeature(index);
+      startAnimationSequence();
+      
+      // Allow interactions only after transition completes
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, transitionDuration);
+    }, 20); // Reduced from 50ms for faster response
   };
 
   // Mark a tab's animation as complete
@@ -161,64 +183,79 @@ export default function FeaturesPage() {
       return newState;
     });
   };
-
-  useEffect(() => {
-    // Progress bar animation - more granular for smoother animation
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) return 100;
-        // Accelerate slightly toward end for natural easing
-        const increment = prev > 85 ? 0.7 : prev > 60 ? 0.6 : 0.5;
-        return Math.min(prev + increment, 100);
+  
+  // Start the full animation sequence for a feature
+  const startAnimationSequence = () => {
+    // Border fill animation - FASTER UPDATES
+    progressIntervalRef.current = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+          return 100;
+        }
+        
+        // Custom easing for natural animation - FASTER INCREMENTS
+        const baseIncrement = 0.8; // increased from 0.5
+        const acceleration = prev < 30 ? 0.4 : // faster start
+                          prev < 70 ? 0.8 : // faster middle
+                          prev < 90 ? 0.6 : // faster slow down
+                          0.4;              // faster finish
+        
+        return Math.min(prev + baseIncrement + acceleration, 100);
       });
-    }, autoRotateDuration / 200);
+    }, fillDuration / 250); // More frequent updates for smoother appearance
 
-    // Mark animation as complete after animationDuration
-    const animationTimer = setTimeout(() => {
+    // Show content when border fill completes
+    animationTimerRef.current = setTimeout(() => {
       markAnimationComplete(activeFeature);
-    }, animationDuration);
+    }, fillDuration + contentShowDelay);
+    
+    // Move to next feature after display duration
+    rotateTimerRef.current = setTimeout(() => {
+      if (!isTransitioning) {
+        const nextFeature = (activeFeature + 1) % features.length;
+        changeFeature(nextFeature);
+      }
+    }, fillDuration + displayDuration);
+  };
 
-    // Auto-rotate to next feature when current feature animation is complete
-    const rotateTimer = setTimeout(() => {
-      changeFeature((activeFeature + 1) % features.length);
-    }, autoRotateDuration);
-
-    return () => {
-      clearInterval(progressInterval);
-      clearTimeout(animationTimer);
-      clearTimeout(rotateTimer);
-    };
+  // Start animation sequence on initial render and when active feature changes
+  useEffect(() => {
+    startAnimationSequence();
+    
+    return () => clearAllTimers();
   }, [activeFeature]);
 
   return (
-    <div className="min-h-screen bg-slate-900 p-6">
+    <div className="min-h-screen bg-slate-900 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center">
-          <h1 className="text-5xl font-bold mb-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">Unparalleled</h1>
-          <h2 className="text-5xl font-bold text-white mb-10">BSS/OSS Capabilities</h2>
+        <div className="text-center mb-14">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-2 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent leading-tight">Unparalleled</h1>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white">BSS/OSS Capabilities</h2>
         </div>
         
-        <div className="bg-gray-900 rounded-xl shadow-2xl overflow-hidden border border-gray-800 shadow-purple-500/10">
+        <div className="bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 rounded-xl shadow-2xl overflow-hidden border border-gray-800 shadow-purple-500/5 hover:shadow-purple-500/10 transition-all duration-700">
           {/* Feature tabs with enhanced loading animations */}
-          <div className="flex">
+          <div className="flex flex-wrap sm:flex-nowrap w-full">
             {features.map((feature, index) => (
               <button
                 key={feature.id}
-                onClick={() => !isTransitioning && changeFeature(index)}
-                className={`relative flex-1 p-4 flex flex-col items-center justify-center transition-all duration-500 overflow-hidden
-                  ${activeFeature === index ? 'bg-gradient-to-br from-slate-800/70 to-slate-900/70' : 'bg-slate-800/50 hover:bg-slate-800/70'}`}
+                onClick={() => !isTransitioning && progress >= 100 && changeFeature(index)}
+                disabled={isTransitioning}
+                className={`relative flex-1 p-3 sm:p-4 flex flex-col items-center justify-center transition-all duration-300 overflow-hidden
+                  ${activeFeature === index ? 'bg-gradient-to-br from-slate-800/80 to-slate-900/90' : 'bg-slate-800/50 hover:bg-slate-800/70'}`}
               >
-                {/* Tab border that fills when active */}
+                {/* Tab border that fills when active - now with enhanced gradient and glow */}
                 <div 
-                  className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r ${feature.gradientFrom} ${feature.gradientTo}`}
+                  className={`absolute bottom-0 left-0 h-1.5 bg-gradient-to-r ${feature.gradientFrom} ${feature.gradientTo}`}
                   style={{
                     width: activeFeature === index ? `${progress}%` : '0%',
-                    transition: activeFeature === index ? 'width 2s ease-in-out' : 'width 0.3s ease-out',
-                    opacity: 1
+                    transition: activeFeature === index ? `width ${fillDuration/1000}s cubic-bezier(0.25, 0.1, 0.25, 1.0)` : 'width 0.2s ease-out',
+                    boxShadow: activeFeature === index && progress > 50 ? '0 0 10px rgba(168, 85, 247, 0.5)' : 'none'
                   }}
                 />
                 
-                {/* Animated glowing effect when border filling completes */}
+                {/* Animated background glow effect when active */}
                 <div 
                   className={`absolute inset-0 bg-gradient-to-r ${feature.gradientFrom} ${feature.gradientTo} transition-opacity duration-500`}
                   style={{
@@ -228,42 +265,47 @@ export default function FeaturesPage() {
                 
                 {/* Icon container with animation */}
                 <div 
-                  className={`relative w-12 h-12 rounded-lg transition-all duration-500 flex items-center justify-center mb-2
+                  className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-lg transition-all duration-300 flex items-center justify-center mb-2
                     ${activeFeature === index 
                       ? `bg-gradient-to-r ${feature.gradientFrom} ${feature.gradientTo} text-white shadow-lg` 
                       : `${feature.color} ${feature.textColor}`}`}
                   style={{
-                    transform: animationComplete[index] && activeFeature === index ? 'scale(1.1)' : 'scale(1)'
+                    transform: animationComplete[index] && activeFeature === index ? 'scale(1.08)' : 'scale(1)',
+                    boxShadow: activeFeature === index ? '0 10px 25px -5px rgba(168, 85, 247, 0.3)' : 'none'
                   }}
                 >
                   {feature.icon}
                 </div>
                 
-                {/* Tab name with fade in animation */}
+                {/* Tab name with fade in animation - faster transitions */}
                 <span 
-                  className={`uppercase font-medium transition-all duration-500 text-sm
+                  className={`uppercase font-medium transition-all duration-300 text-xs sm:text-sm
                     ${activeFeature === index ? 'opacity-100' : 'opacity-40'}`}
                   style={{
-                    background: activeFeature === index ? 'linear-gradient(to right, #e2e8f0, #f8fafc)' : '',
+                    background: activeFeature === index 
+                      ? 'linear-gradient(to right, #e2e8f0, #f8fafc)' 
+                      : '',
                     WebkitBackgroundClip: activeFeature === index ? 'text' : '',
                     WebkitTextFillColor: activeFeature === index ? 'transparent' : '',
+                    letterSpacing: '0.5px'
                   }}
                 >
                   {feature.id}
                 </span>
-                
-                {/* Progress indicator circles */}
-                <div className="absolute top-2 right-2 flex space-x-1">
-                  {activeFeature === index && (
-                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse"/>
-                  )}
-                </div>
+
+                {/* Loading indicator dot - faster pulse */}
+                {activeFeature === index && !animationComplete[index] && (
+                  <div className="absolute top-2 right-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" 
+                         style={{animation: 'pulse 0.8s infinite'}}/>
+                  </div>
+                )}
               </button>
             ))}
           </div>
 
-          {/* Content Area with synchronized animations */}
-          <div className="p-8 min-h-[400px] relative">
+          {/* Enhanced Content Area with faster animations */}
+          <div className="p-5 sm:p-8 min-h-[350px] sm:min-h-[400px] relative">
             {features.map((feature, index) => {
               const isActive = activeFeature === index;
               const isAnimated = isActive && animationComplete[index];
@@ -271,48 +313,83 @@ export default function FeaturesPage() {
               return (
                 <div
                   key={feature.id}
-                  className={`absolute inset-0 p-8 transition-all duration-700 transform
+                  className={`absolute inset-0 p-5 sm:p-8 transition-all duration-400 transform
                     ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}
                 >
-                  {/* Content that appears after border fills completely */}
+                  {/* Content with enhanced layout and faster animations */}
                   <div 
-                    className="flex flex-col md:flex-row"
+                    className="flex flex-col md:flex-row gap-6 md:gap-8 h-full"
                     style={{
-                      opacity: isAnimated ? 1 : 0.7,
-                      transition: 'opacity 0.5s ease-in-out',
-                      filter: isAnimated ? 'blur(0px)' : 'blur(1px)'
+                      opacity: isAnimated ? 1 : 0.3,
+                      transition: 'all 0.4s cubic-bezier(0.3, 0.0, 0.2, 1)',
+                      filter: isAnimated ? 'blur(0px)' : 'blur(2px)'
                     }}
                   >
                     <div 
-                      className="md:w-1/2 mb-6 md:mb-0 transition-all duration-700 transform"
+                      className="md:w-2/5 lg:w-1/2"
                       style={{ 
-                        transform: isAnimated ? 'translateX(0)' : 'translateX(-10px)',
-                        transition: 'all 0.7s ease-out'
+                        transform: isAnimated ? 'translateY(0)' : 'translateY(15px)',
+                        transition: 'all 0.4s cubic-bezier(0.3, 0.0, 0.2, 1) 0.05s'
                       }}
                     >
-                      <h3 className="text-3xl font-bold mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text text-transparent">
+                      <h3 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text text-transparent">
                         {feature.title}
                       </h3>
-                      <p className="text-gray-300 text-lg">
+                      <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
                         {feature.description}
                       </p>
+                      
+                      {/* Added call-to-action button */}
+                      <div className="mt-6 hidden sm:block">
+                        <button 
+                          className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium rounded-lg 
+                                   shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 hover:scale-105 transition-all duration-300"
+                        >
+                          Explore {feature.id}
+                        </button>
+                      </div>
                     </div>
+                    
                     <div 
-                      className="md:w-1/2 md:pl-8 transition-all duration-700 transform"
+                      className="md:w-3/5 lg:w-1/2 md:pl-4 lg:pl-6 border-l border-gray-700/50"
                       style={{ 
-                        transform: isAnimated ? 'translateX(0)' : 'translateX(10px)',
-                        transition: 'all 0.7s ease-out 0.1s' // slight delay for staggered animation
+                        transform: isAnimated ? 'translateY(0)' : 'translateY(15px)',
+                        transition: 'all 0.4s cubic-bezier(0.3, 0.0, 0.2, 1) 0.1s' // Faster with shorter delay
                       }}
                     >
-                      {feature.content}
+                      {/* Content container with enhanced styling */}
+                      <div className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 rounded-xl p-4 sm:p-5 shadow-lg border border-gray-700/30">
+                        {feature.content}
+                      </div>
                     </div>
                   </div>
                 </div>
               );
             })}
-          </div>
+          </div>       
 
-         
+          {/* Quick navigation controls */}
+          <div className="bg-gray-800/50 py-1.5 px-4 flex items-center justify-center space-x-3">
+            {features.map((_, index) => (
+              <button 
+                key={index}
+                onClick={() => !isTransitioning && changeFeature(index)}
+                disabled={isTransitioning}
+                className="relative h-1.5 transition-all duration-300 outline-none"
+              >
+                <div 
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    activeFeature === index 
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500' 
+                      : 'bg-gray-600 hover:bg-gray-500'
+                  }`}
+                  style={{
+                    width: activeFeature === index ? '20px' : '8px'
+                  }}
+                />
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

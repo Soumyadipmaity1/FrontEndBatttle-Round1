@@ -5,6 +5,7 @@ import { CarbonEmissionsSection } from "@/components/carbon-emissions-section"
 import CustomerSay from "@/components/CustomerSay"
 import { HeroSection } from "@/components/herosection"
 import ProductCarousel from "@/components/addCarasoul"
+import { Footer } from "@/components/footer"
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
         <CarbonEmissionsSection />
         <CustomerSay/>
       </main>
+      <Footer/>
     </div>
   )
 }

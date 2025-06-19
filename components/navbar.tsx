@@ -111,26 +111,20 @@ export function Navbar() {
           <div className="md:hidden border-t border-border/40 bg-background/95 backdrop-blur-xl">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <a
-                href="#stats"
+                href="/parallelx"
                 className="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-all duration-200"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Analytics
               </a>
               <a
-                href="#brands"
+                href="/features"
                 className="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-all duration-200"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Brand Kits
+                Features
               </a>
-              <a
-                href="#emissions"
-                className="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-all duration-200"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Emissions
-              </a>
+      
               <a
                 href="/index.html"
                 className="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg transition-all duration-200"

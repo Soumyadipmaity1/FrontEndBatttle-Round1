@@ -139,9 +139,6 @@ const CustomerSay = () => {
         </AnimatePresence>
       </div>
       
-      {/* Decorative elements */}
-      <div className="absolute top-4 right-4 w-20 h-20 rounded-full bg-purple-500 opacity-10 blur-2xl" />
-      <div className="absolute bottom-10 left-10 w-16 h-16 rounded-full bg-pink-500 opacity-10 blur-2xl" />
     </motion.div>
   );
 };
