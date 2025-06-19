@@ -198,15 +198,44 @@
 @keyframes float {
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(0) scale(1);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-20px) scale(1.05);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-15px) scale(1.03);
+  }
+}
+
+@keyframes float-delay {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-25px) scale(1.08);
   }
 }
 
 .animate-float {
-  animation: float 3s ease-in-out infinite;
+  animation: float 8s infinite ease-in-out;
+}
+
+.animate-float-slow {
+  animation: float-slow 12s infinite ease-in-out;
+}
+
+.animate-float-delay {
+  animation: float-delay 10s infinite ease-in-out;
+  animation-delay: 2s;
 }
 
 /* Prevent scrolling during loading */
@@ -245,4 +274,3 @@ body.loading {
     opacity: 0;
   }
 }
-    
