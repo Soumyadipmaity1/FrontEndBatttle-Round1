@@ -274,3 +274,38 @@ body.loading {
     opacity: 0;
   }
 }
+.carouselContainer {
+  position: relative;
+  overflow: hidden;
+}
+
+.carouselCard {
+  transition: all 0.4s ease;
+  transform-origin: center center;
+}
+
+.carouselCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.imageWrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.badgeNew {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
