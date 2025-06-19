@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   description: "A stunning modern dashboard with perfect dark/light mode support and responsive design",
   keywords: ["dashboard", "analytics", "carbon emissions", "portfolio management"],
   authors: [{ name: "HackathonPro Team" }],
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
