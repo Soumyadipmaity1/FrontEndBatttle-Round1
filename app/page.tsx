@@ -4,6 +4,7 @@ import { BrandKitsSection } from "@/components/brand-kits-section"
 import { CarbonEmissionsSection } from "@/components/carbon-emissions-section"
 import CustomerSay from "@/components/CustomerSay"
 import { HeroSection } from "@/components/herosection"
+import ProductCarousel from "@/components/addCarasoul"
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
         <HeroSection/>
         <StatsSection />
         <BrandKitsSection />
+        <ProductCarousel/>
         <CarbonEmissionsSection />
         <CustomerSay/>
       </main>
